@@ -168,7 +168,7 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
 						to='/browse'
                     >
                         <SearchIcon className={classes.extendedIcon} />
-                        Browse As Guest
+                        Browse Available Names As Guest
                     </Fab>
                 </div>
             </Grid>
