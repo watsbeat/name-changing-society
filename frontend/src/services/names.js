@@ -9,6 +9,16 @@ export async function getNames() {
     }
 }
 
+export async function getUserCurrentName(userId) {
+    try {
+        const response = await api.get(`/users/${userId}`);
+        console.log('response', response);
+        return response.data;
+    } catch (err) {
+        console.error(`Failed to retrieve current name for user id ${userId}: ${JSON.stringify(err)}`);
+    }
+}
+
 export async function submitNewName(newName, userId) {
     try {
         const response = await api.post(`/users/${userId}`, newName);
@@ -21,7 +31,6 @@ export async function submitNewName(newName, userId) {
 
 export async function getUserNameHistory(userId) {
     try {
-        console.log(`user id ${userId}`);
         const response = await api.get(`/users/${userId}/history`);
         return response.data;
     } catch (err) {
