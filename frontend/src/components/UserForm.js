@@ -163,11 +163,12 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
                         color="secondary"
                         aria-label="add"
                         size="medium"
+                        variant="extended"
 						component={Link}
 						to='/browse'
                     >
                         <SearchIcon className={classes.extendedIcon} />
-                        Browse Available Names As Guest
+                        Browse As Guest
                     </Fab>
                 </div>
             </Grid>
