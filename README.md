@@ -51,9 +51,12 @@ brew services start postgresql
 # or psql postgres
 createdb ncs # create database
 psql -d ncs # login
+#logout
 # Setup database schema:
-psql -d ncs < model/schema/users.sql
-psql -d ncs < model/schema/ncs.sql
+psql ncs < node_modules/connect-pg-simple/table.sql
+psql -d ncs < sql/create_users.sql
+psql -d ncs < sql/create_names.sql
+psql -d ncs < sql/create_citizens.sql
 ```
 
 ## Frontend
