@@ -26,8 +26,8 @@ usersRouter.route('/:user_id')
             try {
                 const { user_id } = req.params;
                 const { name } = req.body;
-                const response = await Users.submitNewName(parseInt(user_id), name);
-                res.send(response);
+                await Users.submitNewName(parseInt(user_id), name);
+                res.send('Created new name!');
             } catch (err) {
                 next(err);
             }

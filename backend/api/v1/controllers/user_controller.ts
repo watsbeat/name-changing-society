@@ -32,23 +32,54 @@ export default new (class Users {
         }
     }
 
-    async submitNewName(user_id: number, name: string) {
+    async isUniqueName(name: string) {
         try {
-            // TODO: user_id or citizen_id cannot be null
-            // Check for uniqueness
-            await db.none(
+            return await db.none(
                 `SELECT * FROM names WHERE full_name = $1 AND current_date BETWEEN start_date AND expiry_date`,
                 name
             );
+        } catch (err) {
+            console.log(err);
+            throw new Error(`Make sure it's unique!`);
+        }
+    }
+
+    async submitNewName(user_id: number, name: string) {
+        try {
+            if (!user_id) {
+                throw new Error('Must be a user!');
+            }
+
+            if (typeof name !== 'string') {
+                throw new Error('Invalid name');
+            }
+            // Check for uniqueness
+            await this.isUniqueName(name);
+
+            // Check if user has current name and set it to expired
             const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
+            const dayBefore = moment().tz('Australia/Brisbane').subtract('1', 'day').format('YYYY-MM-DD');
+
+            const currentName = await db.oneOrNone(
+                `SELECT * FROM names WHERE user_id = $1 AND $2 BETWEEN start_date AND expiry_date`,
+                [user_id, currentDate]
+            );
+
+            if (currentName) {
+                console.log(`Updating ${currentName.full_name}`);
+                await db.none(
+                    `UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND $3::date BETWEEN start_date AND expiry_date`,
+                    [dayBefore, user_id, currentDate]
+                );
+            }
+
             const oneYearLater = moment().tz('Australia/Brisbane').add(1, 'year').format('YYYY-MM-DD');
             return await db.none(
                 'INSERT INTO names (full_name, user_id, start_date, expiry_date) VALUES ($1, $2, $3, $4)',
                 [name, user_id, currentDate, oneYearLater]
             );
         } catch (err) {
-            console.error(err);
-            throw new Error(`Error submitting new name. Make sure it's unique!`);
+            throw new Error(`Failed to create new name. ${err}`);
         }
     }
 })();

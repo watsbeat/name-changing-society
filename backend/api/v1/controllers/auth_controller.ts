@@ -7,7 +7,7 @@ const passport = require('passport');
 export const register = async (req: any, res: any, next: any) => {
     try {
         console.log(req.body);
-        const { username, password } = req.body;
+        const { username, password, email } = req.body;
         
         // Check if user already exists
         await db.none('SELECT * FROM users WHERE username = $1', username);
@@ -17,10 +17,11 @@ export const register = async (req: any, res: any, next: any) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        await db.none('INSERT INTO users (username, password, user_id) VALUES ($1, $2, $3)', [
+        await db.none('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [
             username,
             hashedPassword,
-            userId,
+            // userId,
+            email
         ]);
         // TODO: Login with new user details or redirect to login
         res.status(200).send('Registered successfully!');
