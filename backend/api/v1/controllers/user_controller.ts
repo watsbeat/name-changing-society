@@ -5,7 +5,7 @@ export default new (class Users {
     async getUserCurrentName(user_id: number): Promise<any> {
         try {
             // TODO: Set constraint so user can only have a single entry for a given date
-            return await db.one(
+            return await db.oneOrNone(
                 `SELECT 
                     full_name,
                     TO_CHAR(start_date, 'yyyy-mm-dd') as start_date,
@@ -16,7 +16,7 @@ export default new (class Users {
             );
         } catch (err) {
             console.error(err);
-            throw new Error(`Error getting current name for user ${user_id}`);
+            throw new Error(`No current name found user ${user_id}`);
         }
     }
 
@@ -70,11 +70,16 @@ export default new (class Users {
                 [user_id, currentDate]
             );
 
+
             // TODO: Set current name to expired - handle this better
             if (currentName) {
+                console.log(currentDate, 'expiry date:', currentName.expiry_date)
+                const newExpiryDate = (currentDate === currentName.expiry_date) ? currentDate : dayBefore;
+                console.log('set to:', newExpiryDate);
+
                 await db.none(
-                    `UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND $3::date BETWEEN start_date AND expiry_date`,
-                    [dayBefore, user_id, currentDate]
+                    `UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND expiry_date = $3`,
+                    [newExpiryDate, user_id, currentName.expiry_date]
                 );
             }
 
