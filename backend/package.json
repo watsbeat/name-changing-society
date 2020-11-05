@@ -4,7 +4,7 @@
   "description": "A REST API for managing citizens current and historical names.",
   "main": "server.ts",
   "engines": {
-    "node": "v14.7.0"
+    "node": "14.7.0"
   },
   "scripts": {
     "start-server-dev": "tsc && node build/server.js",
