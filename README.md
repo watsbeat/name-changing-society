@@ -40,19 +40,14 @@ SESSION_SECRET=<some_gibberish>
 #### Database
 
 ```bash
-cd <migration-folder>
-psql -d ncs -f <migration-file>.sql
-```
-
-```bash
 brew update
 brew install postgres
 brew services start postgresql
 # or psql postgres
 createdb ncs # create database
 psql -d ncs # login
-#logout
-# Setup database schema:
+
+# Setup database schema (or run in a GUI like pgAdmin):
 psql ncs < node_modules/connect-pg-simple/table.sql
 psql -d ncs < sql/create_users.sql
 psql -d ncs < sql/create_names.sql

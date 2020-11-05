@@ -6,7 +6,7 @@ const passport = require('passport');
 export const register = async (req: any, res: any, next: any) => {
     try {
         console.log(req.body);
-        const { username, password, email, full_name } = req.body;
+        const { username, password, email } = req.body;
 
         // Check if user already exists
         await db.none('SELECT * FROM users WHERE username = $1', username);
@@ -18,13 +18,13 @@ export const register = async (req: any, res: any, next: any) => {
         await db.none('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [
             username,
             hashedPassword,
-            email,
+            email
         ]);
 
-        const newUser = await db.one('SELECT * FROM users WHERE username = $1 AND password $2', [
-            username,
-            password,
-        ]);
+        // const newUser = await db.one('SELECT * FROM users WHERE username = $1 AND password $2', [
+        //     username,
+        //     password,
+        // ]);
 
         // TODO: Create current name for user at registration
         // User.submitNewName(newUser.userId, full_name)

@@ -8,11 +8,11 @@
   },
   "scripts": {
     "start-server-dev": "tsc && node build/server.js",
-    "start-dev": "nodemon -e ts -w ./ -x npm run start-server",
+    "start-dev": "nodemon -e ts -w ./ -x npm run start-server-dev",
     "start": "node build/server.js",
     "tsc": "tsc",
     "postinstall": "npm run tsc",
-    "watch-node": "nodemon dist/server.js",
+    "watch-node": "nodemon build/server.js",
     "watch-ts": "tsc -w",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
