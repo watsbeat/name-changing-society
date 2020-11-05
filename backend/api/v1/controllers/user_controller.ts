@@ -4,9 +4,14 @@ import { db } from '../config/db';
 export default new (class Users {
     async getUserCurrentName(user_id: number): Promise<any> {
         try {
-            // TODO: set constraint so user can only have a single entry for a given date
+            // TODO: Set constraint so user can only have a single entry for a given date
             return await db.one(
-                'SELECT * FROM names WHERE user_id = $1 AND current_date BETWEEN start_date AND expiry_date',
+                `SELECT 
+                    full_name,
+                    TO_CHAR(start_date, 'yyyy-mm-dd') as start_date,
+                    TO_CHAR(expiry_date, 'yyyy-mm-dd') as expiry_date
+                FROM names
+                WHERE user_id = $1 AND current_date BETWEEN start_date AND expiry_date`,
                 user_id
             );
         } catch (err) {

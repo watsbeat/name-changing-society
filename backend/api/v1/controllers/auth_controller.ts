@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { db } from '../config/db';
 import bcrypt from 'bcrypt';
 
@@ -12,8 +11,7 @@ export const register = async (req: any, res: any, next: any) => {
         // Check if user already exists
         await db.none('SELECT * FROM users WHERE username = $1', username);
         
-        // Create new user in db with unique id and hashed password
-        const userId = uuidv4();
+        // Create new user in db and hashed password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
