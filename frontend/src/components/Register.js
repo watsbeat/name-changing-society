@@ -16,7 +16,7 @@ const Register = ({ history }) => {
 		registerUser(userDetails)
 			.then((response) => {
 				console.log('register user res:', response);
-				setLoggedInUser(response.username);
+				setLoggedInUser(response.id);
 				dispatch({
 					type: 'setLoggedInUser',
 					data: getLoggedInUser(),

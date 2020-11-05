@@ -21,7 +21,8 @@ export async function submitNewName(newName, userId) {
 
 export async function getUserNameHistory(userId) {
     try {
-        const response = await api.get(`/users/38d4ec5a-f423-43e6-9871-9d05b824342e/history`);
+        console.log(`user id ${userId}`);
+        const response = await api.get(`/users/${userId}/history`);
         return response.data;
     } catch (err) {
         console.error(`Failed to retrieve user's name history: ${JSON.stringify(err)}`);
