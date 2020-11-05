@@ -20,7 +20,8 @@ app.use(logger);
 // app.use(validation);
 
 const allowList = [
-	'http://localhost:3000'
+    'http://localhost:3000',
+    'https://awesome-borg-a5a854.netlify.app'
 ]
 
 const corsOptions = {
