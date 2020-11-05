@@ -65,8 +65,8 @@ export default new (class Users {
                 [user_id, currentDate]
             );
 
+            // TODO: Set current name to expired - handle this better
             if (currentName) {
-                console.log(`Updating ${currentName.full_name}`);
                 await db.none(
                     `UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND $3::date BETWEEN start_date AND expiry_date`,
                     [dayBefore, user_id, currentDate]
