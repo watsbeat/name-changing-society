@@ -13,9 +13,10 @@ Some key dependencies:
 
 ## Setup Instructions
 
+Clone repo to your local machine: `git clone https://github.com/watsbeat/name-changing-society`
+
 ### Backend
 
-- Clone repo to your local machine: `git clone https://github.com/watsbeat/name-changing-society`
 - Change into backend directory: `cd name-changing-society/backend`
 - Install & use the correct node version: `nvm install` and `nvm use` (v14)
 - Install npm packages: `npm i`
@@ -54,6 +55,16 @@ psql -d ncs # login
 psql -d ncs < model/schema/users.sql
 psql -d ncs < model/schema/ncs.sql
 ```
+
+## Frontend
+
+In a new terminal:
+
+- Change into frontend directory: `cd name-changing-society/backend`
+- Install & use the correct node version: `nvm install` and `nvm use` (v14)
+- Install npm packages: `npm i`
+- Launch the client app: `npm start`
+- Go to `http://localhost:3000/`
 
 ## API Endpoints
 
