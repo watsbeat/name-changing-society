@@ -9,8 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AppsIcon from '@material-ui/icons/Apps';
-import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
