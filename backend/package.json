@@ -5,6 +5,7 @@
   "main": "server.ts",
   "scripts": {
     "start-server": "tsc && node build/server.js",
+    "start-prod": "node build/server.js",
     "start": "npm run start-server",
     "start-dev": "nodemon -e ts -w ./ -x npm run start-server",
     "test": "echo \"Error: no test specified\" && exit 1"
