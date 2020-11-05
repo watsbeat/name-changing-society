@@ -4,7 +4,6 @@ import { useGlobalState } from '../config/globalState';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import Names from './Names';
 import HistoricalNames from './UserNameHistory';
-import CurrentName from './CurrentName';
 import { getUserCurrentName, getUserNameHistory } from '../services/names';
 import RequestNewName from './RequestNewName';
 
