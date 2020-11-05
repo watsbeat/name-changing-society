@@ -1,0 +1,12 @@
+openapi: '3.0.2'
+info:
+  title: Name Changing API
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /healthcheck:
+    get:
+      responses:
+        '200':
+          description: OK
