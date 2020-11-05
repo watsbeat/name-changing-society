@@ -2,7 +2,7 @@
 
 PERN stack: [PostgreSQL](https://www.postgresql.org), [Express](https://expressjs.com), [React](https://reactjs.org) & [Node](https://nodejs.org/en/).
 
-Live App: [Coming Soon]
+Live App: <https://awesome-borg-a5a854.netlify.app>
 
 Some key dependencies:
 
