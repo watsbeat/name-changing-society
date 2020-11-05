@@ -68,8 +68,6 @@ In a new terminal:
 
 ## API Endpoints
 
-----
-
 1. POST `v1/auth/register` - Create new user, if not already logged in.
 2. POST `v1/auth/login` - Log user in, if not already logged in.
 3. GET `v1/auth/logout` - Log user out, if not already logged out.
@@ -81,8 +79,6 @@ In a new terminal:
 7. GET `v1/users/:user_id/history` - Get user's historical names, including their current one (for a comprehesive history).
 
 ## Considerations
-
-----
 
 ### Future Features
 
@@ -111,8 +107,6 @@ Write SQL to retrieve the users that have names more than 1 year old, "expiring"
 - Write a CRON job that will send a daily email to World Name Society.
 - Make a public API endpoint that the World Name Society can use as they please to retrieve the list directly from us.
 - Extend the frontend app to allow World Name Society members (create new role, different from citizen users) to login and audit the expiring names through our interface, e.g. they can mark citizens as "followed up on" or "outstanding".
-
-----
 
 ## Screenshots During Dev Phase
 
