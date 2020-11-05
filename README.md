@@ -94,8 +94,8 @@ In a new terminal:
 
 If the current date is 2019-11-01, the current name is Name2 and the future/"scheduled" name is Name3. Name3 will come into effect from 2019-12-15, until it gets "closed" by the user submitting a subsequent name change.
 
-name  | held_from  | held_to
-------|------------|------------|
+name  | held_from  | held_to    | NOTES
+------|------------|------------|---------
 Name3 | 2019-12-15 | infinity   | *"open"/current name*
 Name2 | 2019-10-11 | 2020-12-14 | *"closed", held for a couple months*
 Name1 | 2019-10-10 | 2020-10-10 | *"closed", held for a year*
