@@ -4,7 +4,7 @@ A backend API built with Node.js, Express & Typescript.
 
 ## Setup
 
-1. Clone repo to your local machine: `git clone TODO`
+1. Clone repo to your local machine: `git clone https://github.com/watsbeat/name-changing-society`
 2. Install & use the correct node version: `nvm install` and `nvm use` (v14)
 3. Install npm packages: `npm i`
 4. Launch the server: `npm start`
