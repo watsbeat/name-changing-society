@@ -17,8 +17,6 @@ Some key dependencies:
 
 ## Setup Instructions
 
-----
-
 Clone repo to your local machine: `git clone https://github.com/watsbeat/name-changing-society`
 
 ### Backend
