@@ -169,7 +169,13 @@ export default function Names({ names }) {
                     <TableHead>
                         <StyledTableRow>
                             <StyledTableCell>
-                                <strong>Name</strong>
+                                <strong>First Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Middle Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Last Name</strong>
                             </StyledTableCell>
                             <StyledTableCell>
                                 <strong>Available From</strong>
