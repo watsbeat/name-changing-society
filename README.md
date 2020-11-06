@@ -108,6 +108,12 @@ Write SQL to retrieve the users that have names more than 1 year old, "expiring"
 - Make a public API endpoint that the World Name Society can use as they please to retrieve the list directly from us.
 - Extend the frontend app to allow World Name Society members (create new role, different from citizen users) to login and audit the expiring names through our interface, e.g. they can mark citizens as "followed up on" or "outstanding".
 
+## DB Schema Design
+
+Rough ERD I made during initial brainstorming session:
+
+![ERD](assets/rough-ERD-name-changing-society.png)
+
 ## Screenshots During Dev Phase
 
 ![Login Page Screenshot](assets/login.png#thumbnail)
