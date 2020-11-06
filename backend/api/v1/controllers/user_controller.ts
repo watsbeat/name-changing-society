@@ -29,9 +29,9 @@ export default new (class Users {
                 SELECT 
                     first_name,
                     middle_name,
-                    last_name
-                    TO_CHAR(start_date, 'yyyy-mm-dd') as held_from,
-                    TO_CHAR(expiry_date, 'yyyy-mm-dd') as held_to
+                    last_name,
+                    TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
+                    TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
                 FROM names WHERE user_id = $1 ORDER BY held_to desc`,
                 user_id
             );
@@ -109,7 +109,7 @@ export default new (class Users {
                     user_id
                     )
                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                [first_name, middle_name, last_name, currentDate, oneYearLater, citizen_id, user_id]
+                [first_name, middle_name, last_name, currentDate, oneYearLater, citizen_id.id, user_id]
             );
         } catch (err) {
             throw new Error(`Failed to create new name. ${err}`);

@@ -1,3 +1,8 @@
+/**
+ * Seeding the database this way won't work properly since the passwords don't get hashed
+ * TODO: Implement a better way of seeding
+ */
+
 BEGIN;
 
 -- Create citizens
