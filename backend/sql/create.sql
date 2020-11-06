@@ -15,14 +15,14 @@ CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 DROP TABLE IF EXISTS citizens CASCADE;
 CREATE TABLE citizens (
     id SERIAL PRIMARY KEY,
-    user_id int NOT NULL references users(id)
+    user_id int references users(id)
 );
-DROP TABLE IF EXISTS users CASCADE;
 
 -- Create users table
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    citizen_id int NOT NULL references citizens(id),
+    citizen_id int UNIQUE references citizens(id), -- should be NOT NULL, but causes issues at signup
     username VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL
