@@ -51,9 +51,7 @@ psql -d <database> # login
 
 # Setup database schema (or run in a GUI like pgAdmin):
 psql <database> < node_modules/connect-pg-simple/table.sql
-psql -d <databas> < sql/create_users.sql
-psql -d <database> < sql/create_names.sql
-psql -d <database> < sql/create_citizens.sql
+psql -d <databas> < sql/create.sql
 ```
 
 ## Frontend
