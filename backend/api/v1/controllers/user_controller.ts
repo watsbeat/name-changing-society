@@ -37,14 +37,19 @@ export default new (class Users {
         }
     }
 
-    async isUniqueName(name: string) {
+    /**
+     * Ensure the proposed new name hasn't belonged to the user in the past, and no other citizen currently has it.
+     * @param name - string
+     * @param user_id - number
+     */
+    async isUniqueName(name: string, user_id: number) {
         try {
+            await db.none(`SELECT * FROM names WHERE user_id = $1 AND full_name = $2`, [user_id, name]);
             return await db.none(
                 `SELECT * FROM names WHERE full_name = $1 AND current_date BETWEEN start_date AND expiry_date`,
                 name
             );
         } catch (err) {
-            console.log(err);
             throw new Error(`Make sure it's unique!`);
         }
     }
@@ -58,8 +63,8 @@ export default new (class Users {
             if (typeof name !== 'string') {
                 throw new Error('Invalid name');
             }
-            // Check for uniqueness
-            await this.isUniqueName(name);
+            
+            await this.isUniqueName(name, user_id);
 
             // Check if user has current name and set it to expired
             const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
@@ -70,17 +75,17 @@ export default new (class Users {
                 [user_id, currentDate]
             );
 
-
             // TODO: Set current name to expired - handle this better
             if (currentName) {
-                console.log(currentDate, 'expiry date:', currentName.expiry_date)
-                const newExpiryDate = (currentDate === currentName.expiry_date) ? currentDate : dayBefore;
+                console.log(currentDate, 'expiry date:', currentName.expiry_date);
+                const newExpiryDate = currentDate === currentName.expiry_date ? currentDate : dayBefore;
                 console.log('set to:', newExpiryDate);
 
-                await db.none(
-                    `UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND expiry_date = $3`,
-                    [newExpiryDate, user_id, currentName.expiry_date]
-                );
+                await db.none(`UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND expiry_date = $3`, [
+                    newExpiryDate,
+                    user_id,
+                    currentName.expiry_date,
+                ]);
             }
 
             const oneYearLater = moment().tz('Australia/Brisbane').add(1, 'year').format('YYYY-MM-DD');
