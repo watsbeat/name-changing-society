@@ -46,7 +46,7 @@ function UserDashboard() {
             getUserCurrentName(loggedInUser)
                 .then((currentName) => {
                     console.log('CURRENT NAME:', currentName);
-                    setCurrentName(currentName.full_name);
+                    setCurrentName(currentName.first_name);
                 })
                 .catch((err) => {
                     console.error(`An error occurred setting user's current name: ${err}`);
