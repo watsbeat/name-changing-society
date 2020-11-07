@@ -4,6 +4,9 @@ import bcrypt from 'bcrypt';
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+/**
+ * The passport.js strategy to apply for user authentication
+ */
 export const strategy = new LocalStrategy(
     {
         usernameField: 'username',
