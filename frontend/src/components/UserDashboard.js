@@ -31,7 +31,9 @@ function UserDashboard() {
     const { store } = useGlobalState();
     const { names, loggedInUser } = store;
     const [historicalNames, setHistoricalNames] = useState([]);
-    const [currentName, setCurrentName] = useState();
+    const [currentFirstName, setCurrentFirstName] = useState('');
+    const [currentMiddleName, setCurrentMiddleName] = useState('');
+    const [currentLastName, setCurrentLastName] = useState('');
 
     useEffect(() => {
         loggedInUser && 
@@ -45,13 +47,15 @@ function UserDashboard() {
         loggedInUser && 
             getUserCurrentName(loggedInUser)
                 .then((currentName) => {
-                    console.log('CURRENT NAME:', currentName);
-                    setCurrentName(currentName.first_name);
+                    // TODO: set full name
+                    setCurrentFirstName(currentName.first_name);
+                    setCurrentMiddleName(currentName.middle_name);
+                    setCurrentLastName(currentName.last_name);
                 })
                 .catch((err) => {
                     console.error(`An error occurred setting user's current name: ${err}`);
                 });
-    }, [loggedInUser, setCurrentName, setHistoricalNames]);
+    }, [loggedInUser, setCurrentFirstName, setCurrentMiddleName, setCurrentLastName, setHistoricalNames]);
 
     const classes = useStyles();
     return (
@@ -62,9 +66,9 @@ function UserDashboard() {
                     <Grid item xs={12} sm={6}>
                     <Paper data-cy="currentName" className={classes.paper}>
                         <Typography data-cy="user">
-                            <h1>Welcome, {currentName}! 👋</h1>
+                            <h1>Welcome, {currentFirstName}! 👋</h1>
                             <p>Are you ready to find your next awesomely unique name?</p>
-                            <p>User ID: {loggedInUser}</p>
+                            <p><strong>Your current name: </strong>{currentFirstName} {currentMiddleName} {currentLastName}</p>
                         </Typography>
                     </Paper>
                     </Grid>
