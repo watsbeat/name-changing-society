@@ -9,7 +9,7 @@ import { authRouter } from './routes/auth_routes';
 export let router = Router();
 
 router.get('/', (req, res) => {
-    res.send('Name Changing Society App 👋');
+    res.send('Name Changing Society API V1 👋');
 });
 
 router.use('/auth', authRouter);

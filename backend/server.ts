@@ -63,6 +63,10 @@ require('./api/v1/config/passport');
 
 app.disable('x-powered-by');
 
+app.use('/', (req, res) => {
+    res.send('Name Changing Society API 👋');
+});
+
 app.use('/v1', router);
 
 app.listen(port, () => {
