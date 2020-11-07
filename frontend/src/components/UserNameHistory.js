@@ -101,11 +101,13 @@ TablePaginationActions.propTypes = {
     rowsPerPage: PropTypes.number.isRequired,
 };
 
-function createData(full_name, start_date, expiry_date) {
+function createData(first_name, middle_name,last_name, held_from, held_to) {
     return {
-        full_name,
-        start_date,
-        expiry_date,
+        first_name,
+        middle_name,
+        last_name,
+        held_from,
+        held_to,
     };
 }
 
@@ -135,9 +137,9 @@ export default function UserNameHistory({ historicalNames }) {
     }
 
     const rows = historicalNames
-        .sort((a, b) => b.start_date - a.start_date)
+        .sort((a, b) => b.held_from - a.held_from)
         .map((historicalName) =>
-            createData(historicalName.full_name, historicalName.start_date, historicalName.expiry_date)
+            createData(historicalName.first_name, historicalName.middle_name, historicalName.last_name, historicalName.held_from, historicalName.held_to)
         );
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -160,7 +162,13 @@ export default function UserNameHistory({ historicalNames }) {
                     <TableHead>
                         <StyledTableRow>
                             <StyledTableCell>
-                                <strong>Name</strong>
+                                <strong>First Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Middle Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Last Name</strong>
                             </StyledTableCell>
                             <StyledTableCell>
                                 <strong>Held From</strong>
@@ -175,15 +183,21 @@ export default function UserNameHistory({ historicalNames }) {
                             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : rows
                         ).map((row) => (
-                            <StyledTableRow data-cy="names" key={row.full_name}>
-                                <StyledTableCell component="th" scope="row" style={{ width: '40%' }} align="left">
-                                    {row.full_name}
+                            <StyledTableRow data-cy="names" key={row.first_name}>
+                                <StyledTableCell component="th" scope="row" style={{ width: '20%' }} align="left">
+                                    {row.first_name}
                                 </StyledTableCell>
-                                <StyledTableCell style={{ width: '30%' }} align="left">
-                                    {row.start_date}
+                                <StyledTableCell component="th" scope="row" style={{ width: '20%' }} align="left">
+                                    {row.middle_name}
                                 </StyledTableCell>
-                                <StyledTableCell style={{ width: '30%' }} align="left">
-                                    {row.expiry_date}
+                                <StyledTableCell component="th" scope="row" style={{ width: '20%' }} align="left">
+                                    {row.last_name}
+                                </StyledTableCell>
+                                <StyledTableCell style={{ width: '20%' }} align="left">
+                                    {row.held_from}
+                                </StyledTableCell>
+                                <StyledTableCell style={{ width: '20%' }} align="left">
+                                    {row.held_to}
                                 </StyledTableCell>
                             </StyledTableRow>
                         ))}

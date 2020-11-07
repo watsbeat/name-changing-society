@@ -68,7 +68,7 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
         event.preventDefault();
         const user = {
             username: userDetails.username,
-            // email: userDetails.email,
+            email: userDetails.email,
             password: userDetails.password,
         };
         console.log('handle submit', user);
@@ -105,7 +105,7 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
                             onChange={handleChange}
                             autoFocus
                         />
-                        {/* {label === 'Register' && (
+                        {label === 'Register' && (
 							<TextField
 								data-cy="email"
 								variant="outlined"
@@ -119,7 +119,7 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
 								autoComplete="email"
 								onChange={handleChange}
 							/>
-						)} */}
+						)}
                         <TextField
                             data-cy="password"
                             variant="outlined"

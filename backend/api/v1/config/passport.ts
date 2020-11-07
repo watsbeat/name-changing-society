@@ -4,14 +4,18 @@ import bcrypt from 'bcrypt';
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+/**
+ * The passport.js strategy to apply for user authentication
+ */
 export const strategy = new LocalStrategy(
     {
         usernameField: 'username',
-        passwordField: 'password',
+        passwordField: 'password'
     },
     async (username: string, password: string, done: any) => {
         try {
             const user = await db.one('SELECT * FROM users WHERE username = $1', username);
+
             const passwordMatches = await bcrypt.compare(password, user.password);
 
             if (!passwordMatches) {

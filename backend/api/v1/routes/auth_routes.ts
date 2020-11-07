@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { jsonParser } from '../general/bodyParser';
-import { register, login, logout } from '../controllers/auth_controller';
-import { shouldBeLoggedIn, shouldBeLoggedOut, userAuthenticated } from '../general/authChecker';
+import { registerUser, loginUser, logoutUser } from '../controllers/auth_controller';
+import { shouldBeLoggedIn, shouldBeLoggedOut } from '../general/authChecker';
 
 export let authRouter = Router();
 
-authRouter.post('/register', jsonParser, shouldBeLoggedOut, register);
-authRouter.post('/login', jsonParser, shouldBeLoggedOut, login);
-authRouter.get('/logout', jsonParser, shouldBeLoggedIn, logout);
+authRouter.post('/register', jsonParser, shouldBeLoggedOut, registerUser);
+authRouter.post('/login', jsonParser, shouldBeLoggedOut, loginUser);
+authRouter.get('/logout', jsonParser, shouldBeLoggedIn, logoutUser);

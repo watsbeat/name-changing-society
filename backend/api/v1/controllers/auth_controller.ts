@@ -1,55 +1,62 @@
 import { db } from '../config/db';
-import bcrypt from 'bcrypt';
+import Users from './user_controller';
 
 const passport = require('passport');
 
-export const register = async (req: any, res: any, next: any) => {
+/**
+ * Register a new user as part of the app signup process
+ */
+export const registerUser = async (req: any, res: any, next: any) => {
     try {
-        console.log(req.body);
-        const { username, password, email } = req.body;
+        // TODO: Should wait until all steps are going to successfully before updating db
+        const userDetails = req.body;
+        const userAlreadyRegistered = await Users.getUser(userDetails);
 
-        // Check if user already exists
-        await db.none('SELECT * FROM users WHERE username = $1', username);
+        if (userAlreadyRegistered) {
+            throw new Error('User already exists. Username and email must be unique.');
+        }
 
-        // Create new user in db and hashed password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        await Users.createNewUser(userDetails);
+        const newRegisteredUserId = await Users.getUser(userDetails);
 
-        await db.none('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [
-            username,
-            hashedPassword,
-            email
-        ]);
+        if (!newRegisteredUserId) {
+            throw new Error('Cannot find newly created user in db. Something went wrong.');
+        }
 
-        // const newUser = await db.one('SELECT * FROM users WHERE username = $1 AND password $2', [
-        //     username,
-        //     password,
-        // ]);
+        await Users.addUserToCitizensList(newRegisteredUserId.id);
+
+        // Get citzen id and update users table
+        const newUserCitizenId = await db.one('SELECT id FROM citizens WHERE user_id = $1', newRegisteredUserId.id);
+        await db.none('UPDATE users SET citizen_id = $1 WHERE id = $2', [newUserCitizenId.id, newRegisteredUserId.id]);
 
         // TODO: Create current name for user at registration
-        // User.submitNewName(newUser.userId, full_name)
-
+        // ! But this would prevent from signing up if current name wasn't unique
+        
         // TODO: Login with new user details or redirect to login
+
         res.status(200).send('Registered successfully!');
     } catch (err) {
         console.error(err);
-        res.status(400).send('Error occurred at signup');
+        res.status(400).send('Error occurred at signup!');
     }
 };
 
-export const login = (req: any, res: any) => {
+/**
+ * Sign in an authenticated user to the app
+ */
+export const loginUser = (req: any, res: any) => {
     passport.authenticate('local')(req, res, () => {
         try {
-            console.log('authenticated user: ', req.body.username);
-            console.log('session: ', req.session);
+            // console.log(`
+            //     user: ${req.body.username}
+            //     session: ${req.session}
+            //     is authenticated: ${req.isAuthenticated()}
+            // `);
             if (req.body.remember) {
-                console.log('Remember', req.body.remember);
                 req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
             } else {
-                console.log('Does not remember');
                 req.session.cookie.expires = false; // Cookie expires at end of session
             }
-            console.log('is authenticated?', req.isAuthenticated());
             res.send(req.user);
         } catch (err) {
             console.error('Error occurred at login:', err);
@@ -57,7 +64,10 @@ export const login = (req: any, res: any) => {
     });
 };
 
-export const logout = (req: any, res: any, next: any) => {
+/**
+ * Sign out a user from the app
+ */
+export const logoutUser = (req: any, res: any, next: any) => {
     try {
         console.log('is authenticated?', req.isAuthenticated());
         req.logout();

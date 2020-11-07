@@ -11,13 +11,11 @@ export const shouldBeLoggedOut = (req: any, res: any, next: any) => {
 };
 
 export const userAuthenticated = (req: any, res: any, next: any) => {
-	console.log('user:', req.user);
-	console.log('session:', req.session);
 	if (req.isAuthenticated()) {
-		console.log('User authenticated');
+		console.log(`User authenticated: ${req.user.username}`);
 		next();
 	} else {
-		console.log('User not authenticated');
+		console.log(`User not authenticated: ${req.user.username}`);
 		res.sendStatus(403);
 	}
 };

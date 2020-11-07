@@ -109,10 +109,12 @@ TablePaginationActions.propTypes = {
     rowsPerPage: PropTypes.number.isRequired,
 };
 
-function createData(full_name, expiry_date) {
+function createData(first_name, middle_name, last_name, held_to) {
     return {
-        full_name,
-        expiry_date,
+        first_name,
+        middle_name,
+        last_name,
+        held_to
     };
 }
 
@@ -142,8 +144,8 @@ export default function Names({ names }) {
     }
 
     const rows = names
-        .sort((a, b) => b.expiry_date - a.expiry_date)
-        .map((name) => createData(name.full_name, name.expiry_date));
+        .sort((a, b) => b.held_to - a.held_to)
+        .map((name) => createData(name.first_name, name.middle_name, name.last_name, name.held_to));
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -167,7 +169,13 @@ export default function Names({ names }) {
                     <TableHead>
                         <StyledTableRow>
                             <StyledTableCell>
-                                <strong>Name</strong>
+                                <strong>First Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Middle Name</strong>
+                            </StyledTableCell>
+                            <StyledTableCell>
+                                <strong>Last Name</strong>
                             </StyledTableCell>
                             <StyledTableCell>
                                 <strong>Available From</strong>
@@ -179,12 +187,18 @@ export default function Names({ names }) {
                             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : rows
                         ).map((row) => (
-                            <StyledTableRow data-cy="names" key={row.full_name}>
-                                <StyledTableCell component="th" scope="row" style={{ width: '50%' }} align="left">
-                                    {row.full_name}
+                            <StyledTableRow data-cy="names" key={row.first_name}>
+                                <StyledTableCell component="th" scope="row" style={{ width: '25%' }} align="left">
+                                    {row.first_name}
                                 </StyledTableCell>
-                                <StyledTableCell style={{ width: '50%' }} align="left">
-                                    {row.expiry_date}
+                                <StyledTableCell component="th" scope="row" style={{ width: '25%' }} align="left">
+                                    {row.middle_name}
+                                </StyledTableCell>
+                                <StyledTableCell component="th" scope="row" style={{ width: '25%' }} align="left">
+                                    {row.last_name}
+                                </StyledTableCell>
+                                <StyledTableCell style={{ width: '25%' }} align="left">
+                                    {row.held_to}
                                 </StyledTableCell>
                             </StyledTableRow>
                         ))}

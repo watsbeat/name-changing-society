@@ -1,6 +1,9 @@
 import { db } from '../config/db';
 
 export default new (class Citizens {
+    /**
+     * Gets all citizens from the database - NOT CURRENTLY USED
+     */
     public async getCitizens(): Promise<any> {
         try {
             return await db.any('SELECT * FROM citizens');

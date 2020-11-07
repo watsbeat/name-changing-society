@@ -1,35 +1,101 @@
 import moment from 'moment';
+import bcrypt from 'bcrypt';
 import { db } from '../config/db';
 
 export default new (class Users {
-    async getUserCurrentName(user_id: number): Promise<any> {
+    /**
+     * Check the db to see if a user with those registration details already exists
+     * @param userDetails - the details the user submitted at signup
+     */
+    getUser = async (userDetails: any): Promise<any> => {
+        try {
+            const { username, email } = userDetails;
+            return await db.oneOrNone('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
+        } catch (err) {
+            console.error(err);
+            throw new Error('Error getting user.');
+        }
+    };
+
+    /**
+     * Create a new user in users db table with a hashed password
+     * @param userDetails - the details the user submitted at signup
+     */
+    createNewUser = async (userDetails: any) => {
+        try {
+            const { username, email, password } = userDetails;
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            // Remove null constraint for citizen_id from users
+            await db.none('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [
+                username,
+                email,
+                hashedPassword,
+            ]);
+        } catch (err) {
+            throw new Error('Failed to create new user in db.');
+        }
+    };
+
+    /**
+     * Create an entry for the user_id in the citizens table
+     * @param userIdToAdd - the user_id to add
+     */
+    addUserToCitizensList = async (userIdToAdd: number) => {
+        try {
+            // TODO: Check to see if user is already has a citizen listing - future feat, assume they don't for now.
+            await db.none(`INSERT INTO citizens (user_id) VALUES (${userIdToAdd})`);
+        } catch (err) {
+            console.error(err);
+            throw new Error('Failed to add user to citizens list.');
+        }
+    };
+
+    /**
+     * Gets the name currently held by the user
+     * @param citizen_id - the user to retrieve the current name for
+     */
+    async getUserCurrentName(citizen_id: number): Promise<any> {
         try {
             // TODO: Set constraint so user can only have a single entry for a given date
+            // * Add another field to filter by to flag which name is active/not "retired"
             return await db.oneOrNone(
                 `SELECT 
-                    full_name,
-                    TO_CHAR(start_date, 'yyyy-mm-dd') as start_date,
-                    TO_CHAR(expiry_date, 'yyyy-mm-dd') as expiry_date
+                    first_name,
+                    middle_name,
+                    last_name,
+                    TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
+                    TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
                 FROM names
-                WHERE user_id = $1 AND current_date BETWEEN start_date AND expiry_date`,
-                user_id
+                WHERE citizen_id = $1 AND current_date::date BETWEEN held_from AND held_to
+                ORDER BY held_from, held_to`,
+                citizen_id
             );
         } catch (err) {
             console.error(err);
-            throw new Error(`No current name found user ${user_id}`);
+            throw new Error(`No current name found user ${citizen_id}`);
         }
     }
 
+    /**
+     * Gets all the names that have been held be the user, historical and current
+     * @param user_id - the user to retrieve name history for
+     */
     async getUserHistoricalNames(user_id: number): Promise<any> {
         try {
+            // TODO: Extract getCitizenIdForUser function
+            const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
             return await db.any(
                 `
                 SELECT 
-                    full_name,
-                    TO_CHAR(start_date, 'yyyy-mm-dd') as start_date,
-                    TO_CHAR(expiry_date, 'yyyy-mm-dd') as expiry_date
-                FROM names WHERE user_id = $1 ORDER BY expiry_date desc`,
-                user_id
+                    first_name,
+                    middle_name,
+                    last_name,
+                    TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
+                    TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
+                FROM names WHERE citizen_id = $1 ORDER BY held_to desc`,
+                citizen_id.id
             );
         } catch (err) {
             console.error(err);
@@ -38,60 +104,103 @@ export default new (class Users {
     }
 
     /**
-     * Ensure the proposed new name hasn't belonged to the user in the past, and no other citizen currently has it.
+     * Ensure the proposed new name hasn't belonged to the user in the past,
+     * and no other citizen currently holds the name.
      * @param name - string
-     * @param user_id - number
+     * @param nameValue - string
+     * @param citizenId - number
      */
-    async isUniqueName(name: string, user_id: number) {
+    async isUniqueName(nameType: string, nameValue: string, citizenId: number) {
         try {
-            await db.none(`SELECT * FROM names WHERE user_id = $1 AND full_name = $2`, [user_id, name]);
+            const type = nameType;
+            await db.none(`SELECT * FROM names WHERE citizen_id = $1 AND $2 = $3`, [citizenId, nameValue, type]);
             return await db.none(
-                `SELECT * FROM names WHERE full_name = $1 AND current_date BETWEEN start_date AND expiry_date`,
-                name
+                `SELECT * FROM names WHERE $1 = $2 AND current_date::date BETWEEN held_from AND held_to`,
+                [nameValue, nameType]
             );
         } catch (err) {
+            console.log(err);
             throw new Error(`Make sure it's unique!`);
         }
     }
 
-    async submitNewName(user_id: number, name: string) {
+    /**
+     * Creates a new full name for the user in the database
+     * @param user_id - the id of the user to create the new name for
+     * @param names - the first, middle, and last names to create
+     */
+    async submitNewName(user_id: number, names: any) {
         try {
+            const { first_name, middle_name, last_name } = names;
+            const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
+
             if (!user_id) {
-                throw new Error('Must be a user!');
+                throw new Error('You must be a user!');
             }
 
-            if (typeof name !== 'string') {
-                throw new Error('Invalid name');
+            for (const name in names) {
+                if (typeof name !== 'string') {
+                    throw new Error('Invalid name.');
+                }
+                await this.isUniqueName(names[name], name, citizen_id.id);
             }
-            
-            await this.isUniqueName(name, user_id);
 
             // Check if user has current name and set it to expired
             const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
             const dayBefore = moment().tz('Australia/Brisbane').subtract('1', 'day').format('YYYY-MM-DD');
 
-            const currentName = await db.oneOrNone(
-                `SELECT * FROM names WHERE user_id = $1 AND $2 BETWEEN start_date AND expiry_date`,
-                [user_id, currentDate]
-            );
+            const currentName = await this.getUserCurrentName(citizen_id.id);
+            console.log(currentName)
 
-            // TODO: Set current name to expired - handle this better
-            if (currentName) {
-                console.log(currentDate, 'expiry date:', currentName.expiry_date);
-                const newExpiryDate = currentDate === currentName.expiry_date ? currentDate : dayBefore;
-                console.log('set to:', newExpiryDate);
-
-                await db.none(`UPDATE names SET expiry_date = $1 WHERE user_id = $2 AND expiry_date = $3`, [
-                    newExpiryDate,
-                    user_id,
-                    currentName.expiry_date,
-                ]);
+            // * If no current name exists, insert the new name as held from the current date until infinity
+            if (!currentName) {
+                return await db.none(
+                    `INSERT INTO names (
+                        first_name,
+                        middle_name,
+                        last_name,
+                        held_from,
+                        held_to,
+                        citizen_id
+                        )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                    [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id]
+                );
             }
 
-            const oneYearLater = moment().tz('Australia/Brisbane').add(1, 'year').format('YYYY-MM-DD');
+            // * If current name held_from date is the current date, overwrite with new name
+            if (currentName.held_from === currentDate) {
+                return await db.none(
+                    `UPDATE names SET 
+                        first_name = $1,
+                        middle_name = $2,
+                        last_name = $3
+                    WHERE citizen_id = $4 AND held_from = $5`,
+                    [first_name, middle_name, last_name, citizen_id.id, currentDate]
+                );
+            }
+
+            // * If current name has a held_from date other than today, "close" it at the day before today
+            const newHeldFromDate = currentDate === currentName.held_to ? currentDate : dayBefore;
+
+            await db.none(`UPDATE names SET held_to = $1 WHERE citizen_id = $2 AND held_from = $3`, [
+                newHeldFromDate,
+                citizen_id.id,
+                currentName.held_from,
+            ]);
+
+            // * Insert new current name after "closing" the previous one at the day before today
             return await db.none(
-                'INSERT INTO names (full_name, user_id, start_date, expiry_date) VALUES ($1, $2, $3, $4)',
-                [name, user_id, currentDate, oneYearLater]
+                `INSERT INTO names (
+                    first_name,
+                    middle_name,
+                    last_name,
+                    held_from,
+                    held_to,
+                    citizen_id
+                    )
+                VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id]
             );
         } catch (err) {
             throw new Error(`Failed to create new name. ${err}`);

@@ -14,6 +14,7 @@ Some key dependencies:
 - [axios](https://github.com/axios/axios): Promise-based HTTP client for the browser and node.js
 - [Material-UI](https://material-ui.com): React component library implementing Material Design
 - [React Router](https://github.com/ReactTraining/react-router#readme): Dynamic routing for React
+- [node-connect-pg-simple](https://github.com/voxpelli/node-connect-pg-simple):A simple, minimal PostgreSQL session store for Connect/Express.
 
 ## Setup Instructions
 
@@ -50,10 +51,7 @@ createdb <database> # create database
 psql -d <database> # login
 
 # Setup database schema (or run in a GUI like pgAdmin):
-psql <database> < node_modules/connect-pg-simple/table.sql
-psql -d <databas> < sql/create_users.sql
-psql -d <database> < sql/create_names.sql
-psql -d <database> < sql/create_citizens.sql
+psql -d <database> < sql/create.sql # creates tables for users, citizens, names and session
 ```
 
 ## Frontend
