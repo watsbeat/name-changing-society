@@ -112,14 +112,13 @@ export default new (class Users {
      */
     async isUniqueName(nameType: string, nameValue: string, citizenId: number) {
         try {
-            const type = nameType;
-            await db.none(`SELECT * FROM names WHERE citizen_id = $1 AND $2 = $3`, [citizenId, nameValue, type]);
-            return await db.none(
-                `SELECT * FROM names WHERE $1 = $2 AND current_date::date BETWEEN held_from AND held_to`,
-                [nameValue, nameType]
+            await db.none(`SELECT * FROM names WHERE citizen_id = $1 AND ${nameType} = $2`, [citizenId, nameValue]);
+            await db.none(
+                `SELECT * FROM names WHERE ${nameType} = $1 AND current_date::date BETWEEN held_from AND held_to`,
+                [nameValue]
             );
+            return true;
         } catch (err) {
-            console.log(err);
             throw new Error(`Make sure it's unique!`);
         }
     }
@@ -138,11 +137,16 @@ export default new (class Users {
                 throw new Error('You must be a user!');
             }
 
-            for (const name in names) {
+            for (const [type, name] of Object.entries(names)) {
                 if (typeof name !== 'string') {
                     throw new Error('Invalid name.');
                 }
-                await this.isUniqueName(names[name], name, citizen_id.id);
+                console.log(type, name);
+                const isUnique = await this.isUniqueName(type, name, citizen_id.id);
+                console.log('CHECK UNIQUENESS:', isUnique);
+                if (!isUnique) {
+                    throw new Error('You must ensure all submitted names are unique.');
+                }
             }
 
             // Check if user has current name and set it to expired
@@ -150,7 +154,6 @@ export default new (class Users {
             const dayBefore = moment().tz('Australia/Brisbane').subtract('1', 'day').format('YYYY-MM-DD');
 
             const currentName = await this.getUserCurrentName(citizen_id.id);
-            console.log(currentName)
 
             // * If no current name exists, insert the new name as held from the current date until infinity
             if (!currentName) {
