@@ -141,9 +141,9 @@ export default new (class Users {
                 if (typeof name !== 'string') {
                     throw new Error('Invalid name.');
                 }
-                console.log(type, name);
+
                 const isUnique = await this.isUniqueName(type, name, citizen_id.id);
-                console.log('CHECK UNIQUENESS:', isUnique);
+                
                 if (!isUnique) {
                     throw new Error('You must ensure all submitted names are unique.');
                 }
