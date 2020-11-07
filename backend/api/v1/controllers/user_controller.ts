@@ -10,7 +10,7 @@ export default new (class Users {
     getUser = async (userDetails: any): Promise<any> => {
         try {
             const { username, email } = userDetails;
-            return await db.oneOrNone('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
+            return await db.oneOrNone('SELECT * FROM users WHERE username = $1 AND email = $2', [username, email]);
         } catch (err) {
             console.error(err);
             throw new Error('Error getting user.');
@@ -27,13 +27,14 @@ export default new (class Users {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Remove null constraint for citizen_id from users
+            // Remove null constraint for citizen_id from users - or get citizen id to add, or remove citizen_id col
             await db.none('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [
                 username,
                 email,
                 hashedPassword,
             ]);
         } catch (err) {
+            console.error(err);
             throw new Error('Failed to create new user in db.');
         }
     };

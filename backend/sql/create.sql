@@ -22,7 +22,6 @@ CREATE TABLE citizens (
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    citizen_id int UNIQUE NOT NULL references citizens(id), -- should be NOT NULL, but causes issues at signup
     username VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL

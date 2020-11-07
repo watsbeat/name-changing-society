@@ -25,10 +25,6 @@ export const registerUser = async (req: any, res: any, next: any) => {
 
         await Users.addUserToCitizensList(newRegisteredUserId.id);
 
-        // Get citzen id and update users table
-        const newUserCitizenId = await db.one('SELECT id FROM citizens WHERE user_id = $1', newRegisteredUserId.id);
-        await db.none('UPDATE users SET citizen_id = $1 WHERE id = $2', [newUserCitizenId.id, newRegisteredUserId.id]);
-
         // TODO: Create current name for user at registration
         // ! But this would prevent from signing up if current name wasn't unique
         
