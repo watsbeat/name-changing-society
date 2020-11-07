@@ -68,7 +68,8 @@ export default new (class Users {
                     TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
                     TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
                 FROM names
-                WHERE user_id = $1 AND current_date::date BETWEEN held_from AND held_to`,
+                WHERE user_id = $1 AND current_date::date BETWEEN held_from AND held_to
+                ORDER BY held_from, held_to`,
                 user_id
             );
         } catch (err) {
@@ -109,7 +110,6 @@ export default new (class Users {
      */
     async isUniqueName(nameType: string, nameValue: string, user_id: number) {
         try {
-            // TODO: check if vulnerable to SQL injection
             const type = nameType;
             await db.none(`SELECT * FROM names WHERE user_id = $1 AND $2 = $3`, [user_id, nameValue, type]);
             return await db.none(
@@ -144,41 +144,51 @@ export default new (class Users {
             const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
             const dayBefore = moment().tz('Australia/Brisbane').subtract('1', 'day').format('YYYY-MM-DD');
 
-            const currentName = await db.oneOrNone(
-                `SELECT * FROM names WHERE user_id = $1 AND $2::date BETWEEN held_from AND held_to`,
-                [user_id, currentDate]
-            );
+            const currentName = await this.getUserCurrentName(user_id);
+            console.log(currentName)
 
             const { first_name, middle_name, last_name } = names;
             const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
 
-            if (currentName) {
-                // * If current name held_from date is the current date, overwrite with new name and finish!
-                if (currentName.held_from === currentDate) {
-                    console.log('CURRENT NAME IS THE SAME');
-                    return await db.none(
-                        `UPDATE names SET 
-                            first_name = $1,
-                            middle_name = $2,
-                            last_name = $3
-                        WHERE user_id = $4 AND held_from = $5`,
-                        [first_name, middle_name, last_name, user_id, currentDate]
-                    );
-                }    
+            // * If no current name exists, insert the new name as held from the current date until infinity
+            if (!currentName) {
+                return await db.none(
+                    `INSERT INTO names (
+                        first_name,
+                        middle_name,
+                        last_name,
+                        held_from,
+                        held_to,
+                        citizen_id,
+                        user_id
+                        )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                    [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id, user_id]
+                );
             }
 
-            // * If current name has a held_from date other than today, set its held_to date to the day before today
-            console.log('CLOSE CURRENT NAME', currentName);
-            // const newEndDate = currentDate === currentName.held_to ? currentDate : dayBefore;
+            // * If current name held_from date is the current date, overwrite with new name
+            if (currentName.held_from === currentDate) {
+                return await db.none(
+                    `UPDATE names SET 
+                        first_name = $1,
+                        middle_name = $2,
+                        last_name = $3
+                    WHERE user_id = $4 AND held_from = $5`,
+                    [first_name, middle_name, last_name, user_id, currentDate]
+                );
+            }
+
+            // * If current name has a held_from date other than today, "close" it at the day before today
+            const newHeldFromDate = currentDate === currentName.held_to ? currentDate : dayBefore;
 
             await db.none(`UPDATE names SET held_to = $1 WHERE user_id = $2 AND held_from = $3`, [
-                dayBefore,
+                newHeldFromDate,
                 user_id,
                 currentName.held_from,
             ]);
 
-            console.log('INSERT NEW NAME');
-            // TODO: insert as held from the current date until infinity
+            // * Insert new current name after "closing" the previous one at the day before today
             return await db.none(
                 `INSERT INTO names (
                     first_name,
