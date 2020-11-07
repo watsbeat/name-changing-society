@@ -54,9 +54,9 @@ export default new (class Users {
 
     /**
      * Gets the name currently held by the user
-     * @param user_id - the user to retrieve the current name for
+     * @param citizen_id - the user to retrieve the current name for
      */
-    async getUserCurrentName(user_id: number): Promise<any> {
+    async getUserCurrentName(citizen_id: number): Promise<any> {
         try {
             // TODO: Set constraint so user can only have a single entry for a given date
             // * Add another field to filter by to flag which name is active/not "retired"
@@ -68,13 +68,13 @@ export default new (class Users {
                     TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
                     TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
                 FROM names
-                WHERE user_id = $1 AND current_date::date BETWEEN held_from AND held_to
+                WHERE citizen_id = $1 AND current_date::date BETWEEN held_from AND held_to
                 ORDER BY held_from, held_to`,
-                user_id
+                citizen_id
             );
         } catch (err) {
             console.error(err);
-            throw new Error(`No current name found user ${user_id}`);
+            throw new Error(`No current name found user ${citizen_id}`);
         }
     }
 
@@ -84,6 +84,8 @@ export default new (class Users {
      */
     async getUserHistoricalNames(user_id: number): Promise<any> {
         try {
+            // TODO: Extract getCitizenIdForUser function
+            const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
             return await db.any(
                 `
                 SELECT 
@@ -92,8 +94,8 @@ export default new (class Users {
                     last_name,
                     TO_CHAR(held_from, 'yyyy-mm-dd') as held_from,
                     TO_CHAR(held_to, 'yyyy-mm-dd') as held_to
-                FROM names WHERE user_id = $1 ORDER BY held_to desc`,
-                user_id
+                FROM names WHERE citizen_id = $1 ORDER BY held_to desc`,
+                citizen_id.id
             );
         } catch (err) {
             console.error(err);
@@ -106,12 +108,12 @@ export default new (class Users {
      * and no other citizen currently holds the name.
      * @param name - string
      * @param nameValue - string
-     * @param user_id - number
+     * @param citizenId - number
      */
-    async isUniqueName(nameType: string, nameValue: string, user_id: number) {
+    async isUniqueName(nameType: string, nameValue: string, citizenId: number) {
         try {
             const type = nameType;
-            await db.none(`SELECT * FROM names WHERE user_id = $1 AND $2 = $3`, [user_id, nameValue, type]);
+            await db.none(`SELECT * FROM names WHERE citizen_id = $1 AND $2 = $3`, [citizenId, nameValue, type]);
             return await db.none(
                 `SELECT * FROM names WHERE $1 = $2 AND current_date::date BETWEEN held_from AND held_to`,
                 [nameValue, nameType]
@@ -129,6 +131,9 @@ export default new (class Users {
      */
     async submitNewName(user_id: number, names: any) {
         try {
+            const { first_name, middle_name, last_name } = names;
+            const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
+
             if (!user_id) {
                 throw new Error('You must be a user!');
             }
@@ -137,18 +142,15 @@ export default new (class Users {
                 if (typeof name !== 'string') {
                     throw new Error('Invalid name.');
                 }
-                await this.isUniqueName(names[name], name, user_id);
+                await this.isUniqueName(names[name], name, citizen_id.id);
             }
 
             // Check if user has current name and set it to expired
             const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
             const dayBefore = moment().tz('Australia/Brisbane').subtract('1', 'day').format('YYYY-MM-DD');
 
-            const currentName = await this.getUserCurrentName(user_id);
+            const currentName = await this.getUserCurrentName(citizen_id.id);
             console.log(currentName)
-
-            const { first_name, middle_name, last_name } = names;
-            const citizen_id = await db.one(`SELECT id FROM citizens WHERE user_id = $1`, user_id);
 
             // * If no current name exists, insert the new name as held from the current date until infinity
             if (!currentName) {
@@ -159,11 +161,10 @@ export default new (class Users {
                         last_name,
                         held_from,
                         held_to,
-                        citizen_id,
-                        user_id
+                        citizen_id
                         )
                     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                    [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id, user_id]
+                    [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id]
                 );
             }
 
@@ -174,17 +175,17 @@ export default new (class Users {
                         first_name = $1,
                         middle_name = $2,
                         last_name = $3
-                    WHERE user_id = $4 AND held_from = $5`,
-                    [first_name, middle_name, last_name, user_id, currentDate]
+                    WHERE citizen_id = $4 AND held_from = $5`,
+                    [first_name, middle_name, last_name, citizen_id.id, currentDate]
                 );
             }
 
             // * If current name has a held_from date other than today, "close" it at the day before today
             const newHeldFromDate = currentDate === currentName.held_to ? currentDate : dayBefore;
 
-            await db.none(`UPDATE names SET held_to = $1 WHERE user_id = $2 AND held_from = $3`, [
+            await db.none(`UPDATE names SET held_to = $1 WHERE citizen_id = $2 AND held_from = $3`, [
                 newHeldFromDate,
-                user_id,
+                citizen_id.id,
                 currentName.held_from,
             ]);
 
@@ -196,11 +197,10 @@ export default new (class Users {
                     last_name,
                     held_from,
                     held_to,
-                    citizen_id,
-                    user_id
+                    citizen_id
                     )
                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-                [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id, user_id]
+                [first_name, middle_name, last_name, currentDate, 'Infinity', citizen_id.id]
             );
         } catch (err) {
             throw new Error(`Failed to create new name. ${err}`);
