@@ -25,7 +25,7 @@ Clone repo to your local machine: `git clone https://github.com/watsbeat/name-ch
 - Change into backend directory: `cd name-changing-society/backend`
 - Install & use the correct node version: `nvm install` and `nvm use` (v14)
 - Install npm packages: `npm i`
-- Launch the server: `npm start`
+- Launch the server: `npm start-dev`
 - Go to `http://localhost:8091/v1` in your browser or test in Postman (import `openapi.yml`)
 
 #### Environment Variables
