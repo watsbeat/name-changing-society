@@ -15,7 +15,6 @@ const Login = ({ history }) => {
 	function handleSubmit(userDetails) {
 		loginUser(userDetails)
 			.then((response) => {
-				console.log('login user res:', response);
 				setLoggedInUser(response.user_id);
 				dispatch({
 					type: 'setLoggedInUser',

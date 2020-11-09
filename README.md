@@ -8,7 +8,6 @@
 
 **Deployed API:** <https://name-changing-society.herokuapp.com> (with Heroku Postgres DB attached)
 
-
 Some key dependencies:
 
 - [pg-promise](https://github.com/vitaly-t/pg-promise): Promise library for postgresql

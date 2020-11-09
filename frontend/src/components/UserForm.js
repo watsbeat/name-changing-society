@@ -73,7 +73,6 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
         if (label === 'Register') {
             user.email = userDetails.email;
         }
-        console.log('USER TO SUBMIT:', user);
         return handleSubmit(user);
     }
 

@@ -66,11 +66,9 @@ const RequestNewName = ({ history }) => {
             middle_name: middleNameState,
             last_name: lastNameState
         };
-        console.log('Name to submit:', newName);
 
         submitNewName(newName, loggedInUser)
             .then((response) => {
-                console.log('Submitted name response:', response);
                 setFirstNameState('');
                 setMiddleNameState('');
                 setLastNameState('');
@@ -78,7 +76,7 @@ const RequestNewName = ({ history }) => {
             .catch((error) => {
                 console.log('Error on name submission:', error);
             });
-        // history.push('/dashboard');
+        history.push('/dashboard');
     }
 
     return (

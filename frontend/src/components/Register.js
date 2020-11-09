@@ -15,7 +15,6 @@ const Register = ({ history }) => {
 	function handleSubmit(userDetails) {
 		registerUser(userDetails)
 			.then((response) => {
-				console.log('register user res:', response);
 				setLoggedInUser(response.id);
 				dispatch({
 					type: 'setLoggedInUser',

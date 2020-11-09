@@ -115,7 +115,6 @@ export default new (class Users {
         try {
             // TODO: Extract getCitizenIdForUser function
             const citizen_id = await db.oneOrNone(`SELECT citizen_id FROM citizens WHERE user_id = $1`, user_id);
-            console.log(citizen_id);
             return await db.any(
                 `
                 SELECT 
