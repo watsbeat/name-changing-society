@@ -2,11 +2,12 @@
 
 **PERN stack:** [PostgreSQL](https://www.postgresql.org), [Express](https://expressjs.com), [React](https://reactjs.org) & [Node](https://nodejs.org/en/).
 
+*Note:* _The deployed client and server apps are not totally working yet, please **run locally** for best results_ 🤓
+
 **Deloyed Client App:** <https://awesome-borg-a5a854.netlify.app>
 
 **Deployed API:** <https://name-changing-society.herokuapp.com> (with Heroku Postgres DB attached)
 
-*Note:* The deployed client and server apps are not totally working yet, run locally for best results 🤓
 
 Some key dependencies:
 
@@ -74,8 +75,16 @@ In a new terminal:
 4. GET `v1/names` - Get list of names available within the next 28 days (unauthenticated access allowed).
 
 5. GET `v1/users/:id` - Get user's current name.
-6. POST `v1/users/:id` - Create a new name for user that they haven't held in the past, and no other citizen currently holds.
+6. POST `v1/users/:id` - Create a new name for user that they haven't held in the past, and no other citizen currently holds. If attempting to create a new name on the same day as a current name is held from, it will overwrite that name.
 7. GET `v1/users/:user_id/history` - Get user's historical names, including their current one (for a comprehesive history).
+
+## Know Bugs 🐞
+
+- Users should be required to submit their current name at sign up/registration. Currently, if you create a new user then login, you won't see anything returned for name history or current name.
+
+- Authentication strategy (local) is not optimal.
+
+- The frontend should have popup dialogs for error messages from the API, e.g. "name must be unique." Currently, the errors only appear in the console or the network tab.
 
 ## Considerations
 
