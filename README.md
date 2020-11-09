@@ -52,6 +52,7 @@ psql -d <database> # login
 
 # Setup database schema (or run in a GUI like pgAdmin):
 psql -d <database> < sql/create.sql # creates tables for users, citizens, names and session
+psql -d <database> < sql/seed.sql # insert fake data
 ```
 
 ## Frontend

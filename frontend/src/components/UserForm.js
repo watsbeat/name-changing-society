@@ -50,7 +50,7 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
     const classes = useStyles();
     const initialFormState = {
         username: '',
-        // email: '',
+        email: '',
         password: '',
     };
     const [userDetails, setUserDetails] = useState(initialFormState);
@@ -66,12 +66,14 @@ const UserForm = ({ label, handleSubmit, errorMessage }) => {
 
     function handleFormSubmit(event) {
         event.preventDefault();
-        const user = {
+        let user = {
             username: userDetails.username,
-            email: userDetails.email,
             password: userDetails.password,
         };
-        console.log('handle submit', user);
+        if (label === 'Register') {
+            user.email = userDetails.email;
+        }
+        console.log('USER TO SUBMIT:', user);
         return handleSubmit(user);
     }
 

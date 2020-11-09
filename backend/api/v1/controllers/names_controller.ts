@@ -5,17 +5,17 @@ export default new (class Names {
     public async listNamesExpiringWithin28Days(): Promise<any> {
         try {
             // TODO: It's possibly better to select held_to as is and use moment-timezone to format it later
-            const currentDate = moment().tz('Australia/Brisbane').format('YYYY-MM-DD');
-            const twentyEightDaysFromToday = moment().tz('Australia/Brisbane').add(28, 'days').format('YYYY-MM-DD');
+            const oneYearOld = moment().tz('Australia/Brisbane').subtract(1, 'years').format('YYYY-MM-DD');
+            const twentyEightDaysFromExpiring = moment.tz('Australia/Brisbane').subtract(1, 'years').subtract(28, 'days').format('YYYY-MM-DD');
             return await db.any(
-                `SELECT 
+                `SELECT
                     first_name,
                     middle_name,
                     last_name,
-                    TO_CHAR(held_to, 'yyyy-mm-dd') AS held_to
+                    TO_CHAR((held_from + interval '1 year'), 'yyyy-mm-dd') AS held_to
                 FROM names
-                WHERE held_to BETWEEN $1 AND $2`,
-                [currentDate, twentyEightDaysFromToday]
+                WHERE held_from BETWEEN $1::date AND $2::date`,
+                [twentyEightDaysFromExpiring, oneYearOld]
             );
         } catch (err) {
             console.error(err);

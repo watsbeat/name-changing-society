@@ -16,7 +16,7 @@ const Login = ({ history }) => {
 		loginUser(userDetails)
 			.then((response) => {
 				console.log('login user res:', response);
-				setLoggedInUser(response.id);
+				setLoggedInUser(response.user_id);
 				dispatch({
 					type: 'setLoggedInUser',
 					data: getLoggedInUser(),

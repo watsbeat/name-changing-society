@@ -1,4 +1,3 @@
-import { db } from '../config/db';
 import Users from './user_controller';
 
 const passport = require('passport');
@@ -17,13 +16,11 @@ export const registerUser = async (req: any, res: any, next: any) => {
         }
 
         await Users.createNewUser(userDetails);
-        const newRegisteredUserId = await Users.getUser(userDetails);
+        const newRegisteredUser = await Users.getUser(userDetails);
 
-        if (!newRegisteredUserId) {
+        if (!newRegisteredUser) {
             throw new Error('Cannot find newly created user in db. Something went wrong.');
         }
-
-        await Users.addUserToCitizensList(newRegisteredUserId.id);
 
         // TODO: Create current name for user at registration
         // ! But this would prevent from signing up if current name wasn't unique
@@ -43,11 +40,10 @@ export const registerUser = async (req: any, res: any, next: any) => {
 export const loginUser = (req: any, res: any) => {
     passport.authenticate('local')(req, res, () => {
         try {
-            // console.log(`
-            //     user: ${req.body.username}
-            //     session: ${req.session}
-            //     is authenticated: ${req.isAuthenticated()}
-            // `);
+            console.log(`
+                user: ${req.body}
+                is authenticated: ${req.isAuthenticated()}
+            `);
             if (req.body.remember) {
                 req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
             } else {
