@@ -3,10 +3,53 @@ info:
   title: Name Changing API
   version: '1.0'
 servers:
-  - url: https://api.server.test/v1
+  - url: http://localhost:8091/v1
 paths:
   /healthcheck:
     get:
+      summary: 'Health Check'
+      responses:
+        '200':
+          description: OK
+  /names:
+    get:
+      summary: 'List Expiring Names'
+      description: 'Get list of citizen names expiring within 28 days'
+      responses:
+        '200':
+          description: OK
+  /users/:user_id:
+    get:
+      summary: 'Get User Current Name'
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: 'Submit New Name for User'
+      responses:
+        '200':
+          description: OK
+  /users/:user_id/history:
+    get:
+      summary: 'Get User Historical Names'
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      summary: 'Login'
+      responses:
+        '200':
+          description: OK
+  /auth/logout:
+    get:
+      summary: 'Logout'
+      responses:
+        '200':
+          description: OK
+  /auth/register:
+    post:
+      summary: 'Register New User'
       responses:
         '200':
           description: OK
