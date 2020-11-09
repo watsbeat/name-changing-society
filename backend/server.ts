@@ -2,6 +2,7 @@ import express from 'express';
 import { router } from './api/v1/app';
 import { db } from './api/v1/config/db';
 import cors from 'cors';
+import { jsonParser } from './api/v1/general/bodyParser';
 import { logger } from './api/v1/general/logging';
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
@@ -14,15 +15,17 @@ const pgSession = require('connect-pg-simple')(expressSession);
 const app = express();
 const port = process.env.PORT || 8091;
 
-app.use(cookieParser());
-app.use(flash());
-app.use(logger);
-// app.use(validation);
-
 const allowList = [
     'http://localhost:3000',
     'https://awesome-borg-a5a854.netlify.app'
-]
+];
+
+app.set('trust proxy', 1);
+
+app.use(cookieParser());
+app.use(flash());
+app.use(logger);
+
 
 const corsOptions = {
 	credentials: true,
@@ -33,11 +36,15 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(jsonParser);
 
 const session = {
     secret: process.env.SESSION_SECRET,
     cookie: {
-        maxAge: 3600000,
+        maxAge: 1800000,
+        sameSite: 'none',
+        secure: true,
+        httpOnly: false,
     },
     resave: false,
     saveUninitialized: false,

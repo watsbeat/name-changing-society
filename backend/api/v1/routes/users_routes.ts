@@ -1,5 +1,4 @@
 import { Router, Request, Response } from 'express';
-import { jsonParser } from '../general/bodyParser';
 import Users from '../controllers/user_controller';
 import { userAuthenticated } from '../general/authChecker';
 
@@ -9,7 +8,6 @@ usersRouter.use(userAuthenticated);
 
 usersRouter.route('/:user_id')
     .get(
-        jsonParser,
         async (req: Request, res: Response, next: Function): Promise<void> => {
             try {
                 const { user_id } = req.params;
@@ -21,7 +19,6 @@ usersRouter.route('/:user_id')
         }
     )
     .post(
-        jsonParser,
         async (req: Request, res: Response, next: Function): Promise<void> => {
             try {
                 const { user_id } = req.params;
@@ -36,7 +33,6 @@ usersRouter.route('/:user_id')
 
 usersRouter.get(
     '/:user_id/history',
-    jsonParser,
     async (req: Request, res: Response, next: Function): Promise<void> => {
         try {
             const { user_id } = req.params;
