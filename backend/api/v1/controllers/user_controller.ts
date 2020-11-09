@@ -30,6 +30,7 @@ export default new (class Users {
             await db.none(`SELECT ${type}_id FROM ${type}s WHERE ${type}_id = ${nextVal.nextval}`);
             return parseInt(nextVal.nextval);
         } catch (err) {
+            console.error(err);
             throw new Error(`Failed to generate new ${type} id, must be unqiue`);
         }
     }
@@ -87,7 +88,7 @@ export default new (class Users {
         try {
             // TODO: Set constraint so user can only have a single entry for a given date
             // * Add another field to filter by to flag which name is active/not "retired"
-            const citizen_id = await db.one(`SELECT citizen_id FROM citizens WHERE user_id = $1`, user_id);
+            const citizen_id = await db.oneOrNone(`SELECT citizen_id FROM citizens WHERE user_id = $1`, user_id);
             return await db.oneOrNone(
                 `SELECT 
                     first_name,
@@ -113,7 +114,7 @@ export default new (class Users {
     async getUserHistoricalNames(user_id: number): Promise<any> {
         try {
             // TODO: Extract getCitizenIdForUser function
-            const citizen_id = await db.one(`SELECT citizen_id FROM citizens WHERE user_id = $1`, user_id);
+            const citizen_id = await db.oneOrNone(`SELECT citizen_id FROM citizens WHERE user_id = $1`, user_id);
             console.log(citizen_id);
             return await db.any(
                 `
@@ -148,6 +149,7 @@ export default new (class Users {
             );
             return true;
         } catch (err) {
+            console.error(err);
             throw new Error(`Make sure it's unique!`);
         }
     }

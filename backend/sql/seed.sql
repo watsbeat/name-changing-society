@@ -58,4 +58,10 @@ VALUES
     ('Murray', 'Murky', 'River', '2019-11-26'::date, 'Infinity', 15),
     ('Silent', 'Quiet', 'Ssh', '2019-11-27'::date, 'Infinity', 16);
 
+-- Store highest user id sequence 
+SELECT SETVAL('users_sequence', (SELECT MAX(user_id) FROM users)::BIGINT);
+
+-- Store highest user id sequence 
+SELECT SETVAL('citizens_sequence', (SELECT MAX(citizen_id) FROM citizens)::BIGINT);
+
 COMMIT;
