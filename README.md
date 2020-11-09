@@ -111,7 +111,7 @@ Write SQL to retrieve the users that have names more than 1 year old, "expiring"
 
 Rough ERD I made during initial brainstorming session:
 
-![ERD](assets/rough-ERD-name-changing-society.png)
+![ERD](assets/name-change-society-erd-2.png)
 
 ## Screenshots During Dev Phase
 
