@@ -115,6 +115,8 @@ Rough ERD I made during initial brainstorming session:
 
 ## Screenshots During Dev Phase
 
-![Login Page Screenshot](assets/login.png#thumbnail)
+![Dashboard Tablet Screenshot](assets/dashboard-desktop-final.png#thumbnail)
 
-![Dashboard Tablet Screenshot](assets/dashboard-tablet.png#thumbnail)
+![Browse Expiring Names Screenshot](assets/browse-expiring-names-final.png#thumbnail)
+
+![Login Page Screenshot](assets/login.png#thumbnail)
