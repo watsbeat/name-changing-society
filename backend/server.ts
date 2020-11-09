@@ -40,6 +40,7 @@ app.use(jsonParser);
 
 const session = {
     secret: process.env.SESSION_SECRET,
+    proxy: true,
     cookie: {
         maxAge: 1800000,
         sameSite: 'none',
