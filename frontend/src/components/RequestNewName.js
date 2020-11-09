@@ -72,11 +72,11 @@ const RequestNewName = ({ history }) => {
                 setFirstNameState('');
                 setMiddleNameState('');
                 setLastNameState('');
+                history.push('/dashboard');
             })
             .catch((error) => {
                 console.log('Error on name submission:', error);
             });
-        history.push('/dashboard');
     }
 
     return (
