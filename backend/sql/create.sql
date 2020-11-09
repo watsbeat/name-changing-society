@@ -1,15 +1,5 @@
 BEGIN;
 
--- Store highest user id sequence 
-DROP SEQUENCE IF EXISTS users_sequence;
-CREATE SEQUENCE users_sequence;
-SELECT SETVAL('users_sequence', (SELECT MAX(user_id) FROM users)::BIGINT);
-
--- Store highest citizen id sequence 
-DROP SEQUENCE IF EXISTS citizens_sequence;
-CREATE SEQUENCE citizens_sequence;
-SELECT SETVAL('citizens_sequence', (SELECT MAX(citizen_id) FROM citizens)::BIGINT);
-
 -- Create session table per https://github.com/voxpelli/node-connect-pg-simple
 DROP TABLE IF EXISTS session;
 CREATE TABLE "session" (
@@ -39,6 +29,16 @@ CREATE TABLE citizens (
     citizen_id SERIAL PRIMARY KEY,
     user_id NUMERIC --references users(user_id)-- foreign key?
 );
+
+-- Store highest user id sequence 
+DROP SEQUENCE IF EXISTS users_sequence;
+CREATE SEQUENCE users_sequence;
+SELECT SETVAL('users_sequence', (SELECT MAX(user_id) FROM users)::BIGINT);
+
+-- Store highest citizen id sequence 
+DROP SEQUENCE IF EXISTS citizens_sequence;
+CREATE SEQUENCE citizens_sequence;
+SELECT SETVAL('citizens_sequence', (SELECT MAX(citizen_id) FROM citizens)::BIGINT);
 
 -- Create names table
 DROP TABLE IF EXISTS names CASCADE;
